@@ -7,6 +7,7 @@ void initChunk(Chunk* chunk) {
   chunk->count = 0;
   chunk->capacity = 0;
   chunk->code = NULL;
+	initValueArray(&chunk->constants);
 }
 
 void writeChunk(Chunk* chunk, uint8_t byte) {
@@ -21,9 +22,16 @@ void writeChunk(Chunk* chunk, uint8_t byte) {
   chunk->count++;
 }
 
+int addConstant(Chunk* chunk, Value value) {
+  writeValueArray(&chunk->constants, value);
+  return chunk->constants.count - 1;
+}
+
 void freeChunk(Chunk* chunk) {
 	// deallocate all of the memory
 	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
+	// deallocate constants
+	freeValueArray(&chunk->constants);
 	// zero out the fields leaving the thunk in a well-defined 
 	// empty state.
 	initChunk(chunk);
