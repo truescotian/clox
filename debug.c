@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "debug.h"
+#include "value.h"
 
 void disassembleChunk(Chunk* chunk, const char* name) {
 	// print header to tell which chunk we're looking at
@@ -10,6 +11,18 @@ void disassembleChunk(Chunk* chunk, const char* name) {
   for (int offset = 0; offset < chunk->count;) {
     offset = disassembleInstruction(chunk, offset);
   }
+}
+
+static int constantInstruction(const char* name, Chunk* chunk,
+                               int offset) {
+	// pull out the constant index from the subsequent byte
+	// in the chunk.
+  uint8_t constantIdx = chunk->code[offset + 1];
+  printf("%-16s %4d '", name, constantIdx);
+  printValue(chunk->constants.values[constantIdx]);
+  printf("'\n");
+
+	return offset+2; // OP_CONSTANT is two bytes: 1 for opcode, 1 for operand
 }
 
 static int simpleInstruction(const char* name, int offset) {
@@ -26,6 +39,8 @@ int disassembleInstruction(Chunk* chunk, int offset) {
 	// This is our opcode.
   uint8_t instruction = chunk->code[offset];
   switch (instruction) {
+		case OP_CONSTANT:
+				return constantInstruction("OP_CONSTANT", chunk, offset);
     case OP_RETURN:
       return simpleInstruction("OP_RETURN", offset);
     default:

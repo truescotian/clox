@@ -5,6 +5,17 @@
 int main(int argc, const char* argv[]) {
 	Chunk chunk;
 	initChunk(&chunk);
+
+	// this is essentially hand-compiling an instruction to our test chunk
+	// since we don't have a compiler yet. So:
+	// Add the constant value itself to the chunk's constant pool.
+	// The return value (constant) is the index of the constant
+	// in the array.
+	int constant = addConstant(&chunk, 1.2);
+	writeChunk(&chunk, OP_CONSTANT);
+	// write a one-byte constant index operand.
+	writeChunk(&chunk, constant);
+
 	writeChunk(&chunk, OP_RETURN);
 
 	// disassemble all of the instructions in the entire chunk
