@@ -1,8 +1,13 @@
 #include "common.h"
 #include "chunk.h"
 #include "debug.h"
+#include "vm.h"
+
+// Entrypoint to my interpreter!
 
 int main(int argc, const char* argv[]) {
+	initVM();
+
 	Chunk chunk;
 	initChunk(&chunk);
 
@@ -20,6 +25,11 @@ int main(int argc, const char* argv[]) {
 
 	// disassemble all of the instructions in the entire chunk
 	disassembleChunk(&chunk, "test chunk");
+
+	// the entrypoint into the VM!
+	interpret(&chunk);
+
+	freeVM();
 	freeChunk(&chunk);
   return 0;
 }
