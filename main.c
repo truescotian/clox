@@ -12,11 +12,11 @@ int main(int argc, const char* argv[]) {
 	// The return value (constant) is the index of the constant
 	// in the array.
 	int constant = addConstant(&chunk, 1.2);
-	writeChunk(&chunk, OP_CONSTANT);
+	writeChunk(&chunk, OP_CONSTANT, 123);
 	// write a one-byte constant index operand.
-	writeChunk(&chunk, constant);
+	writeChunk(&chunk, constant, 123);
 
-	writeChunk(&chunk, OP_RETURN);
+	writeChunk(&chunk, OP_RETURN, 123);
 
 	// disassemble all of the instructions in the entire chunk
 	disassembleChunk(&chunk, "test chunk");
