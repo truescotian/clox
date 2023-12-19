@@ -32,15 +32,29 @@ Value pop() {
 static InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
+#define BINARY_OP(op) \
+	do { \
+		double b = pop(); \
+		double a = pop(); \
+		push(a op b); \
+	} while (false)
 
-  for (;;) {
+	for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
-	// since it takes an integer byte offset and we store the current
-	// instruction reference as a direct pointer, do pointer math to convert
-	// ip back to a relative offset from the beginning of the bytecode.
-	// Then we disassemble the instruction that begins at that byte.
-	disassembleInstruction(vm.chunk, 
-			(int)(vm.ip - vm.chunk->code));
+		printf("          ");
+		// print contents of the stack
+		for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
+      printf("[ ");
+      printValue(*slot);
+      printf(" ]");
+    }
+    printf("\n");
+		// since it takes an integer byte offset and we store the current
+		// instruction reference as a direct pointer, do pointer math to convert
+		// ip back to a relative offset from the beginning of the bytecode.
+		// Then we disassemble the instruction that begins at that byte.
+		disassembleInstruction(vm.chunk, 
+				(int)(vm.ip - vm.chunk->code));
 #endif
 
     uint8_t instruction;
@@ -53,11 +67,17 @@ static InterpretResult run() {
     switch (instruction = READ_BYTE()) {
 			case OP_CONSTANT: {
         Value constant = READ_CONSTANT();
-        printValue(constant);
-        printf("\n");
+				push(constant);
         break;
       }
+			case OP_ADD:      BINARY_OP(+); break;
+      case OP_SUBTRACT: BINARY_OP(-); break;
+      case OP_MULTIPLY: BINARY_OP(*); break;
+      case OP_DIVIDE:   BINARY_OP(/); break;									
+			case OP_NEGATE: push(-pop()); break;
       case OP_RETURN: {
+				printValue(pop());
+				printf("\n");
         return INTERPRET_OK;
       }
     }
@@ -65,6 +85,7 @@ static InterpretResult run() {
 
 #undef READ_BYTE
 #undef READ_CONSTANT
+#undef BINARY_OP
 }
 
 InterpretResult interpret(Chunk* chunk) {
