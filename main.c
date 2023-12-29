@@ -8,6 +8,8 @@
 #include "vm.h"
 
 static void repl() {
+	printf("Entered the REPL!\n");
+
   char line[1024];
   for (;;) {
     printf("> ");

@@ -5,9 +5,13 @@
 #include "scanner.h"
 
 void compile(const char* source) {
+	printf("Compiling source\n");
+
   initScanner(source);
 
 	int line = -1;
+
+	printf("Scanning tokens\n");
   for (;;) {
     Token token = scanToken();
 
@@ -30,4 +34,6 @@ void compile(const char* source) {
 
     if (token.type == TOKEN_EOF) break;
   }
+
+	printf("Compile complete!\n");
 }
